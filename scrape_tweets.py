@@ -4,7 +4,6 @@ import pandas as pd
 from datetime import date
 
 
-
 def scrapeTweets(start, stop, keyword, directory, tweet_limit=1):
     if not os.path.exists(directory):  # Creates directory in current directory if doesn't already exist
         os.mkdir(directory)
@@ -39,6 +38,7 @@ def scrapeTweets(start, stop, keyword, directory, tweet_limit=1):
         return print(f'Successfully saved DataFrame to {file_path}')
     else:
         return print('DataFrame not saved -- possible error has occurred.')
+
 
 start_time_tsla = date(2020, 1, 1).strftime('%Y-%m-%d')
 end_time_tsla = date(2022, 1, 1).strftime('%Y-%m-%d')
