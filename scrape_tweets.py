@@ -1,6 +1,7 @@
 import snscrape.modules.twitter as sntwitter
 import os
 import pandas as pd
+from datetime import date
 
 
 
@@ -38,3 +39,9 @@ def scrapeTweets(start, stop, keyword, directory, tweet_limit=1):
         return print(f'Successfully saved DataFrame to {file_path}')
     else:
         return print('DataFrame not saved -- possible error has occurred.')
+
+start_time_tsla = date(2020, 1, 1).strftime('%Y-%m-%d')
+end_time_tsla = date(2022, 1, 1).strftime('%Y-%m-%d')
+
+if __name__ == '__main__':
+    scrapeTweets(start=start_time_tsla, stop=end_time_tsla, keyword='TSLA', directory='tweets_TSLA', tweet_limit=50000)
