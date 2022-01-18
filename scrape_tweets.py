@@ -44,4 +44,4 @@ start_time_tsla = date(2020, 1, 1).strftime('%Y-%m-%d')
 end_time_tsla = date(2022, 1, 1).strftime('%Y-%m-%d')
 
 if __name__ == '__main__':
-    scrapeTweets(start=start_time_tsla, stop=end_time_tsla, keyword='TSLA', directory='tweets_TSLA', tweet_limit=50000)
+    main()
