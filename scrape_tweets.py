@@ -4,14 +4,15 @@ import pandas as pd
 from datetime import date
 
 
-def scrapeTweets(start, stop, keyword, directory, tweet_limit=1):
-    if not os.path.exists(directory):  # Creates directory in current directory if doesn't already exist
-        os.mkdir(directory)
+def scrapeTweets(start_date, end_date, keyword, current_dir, tweet_limit=1, iteration=1):
+    if not os.path.exists(current_dir):  # Creates directory in current directory if doesn't already exist
+        os.mkdir(current_dir)
 
-    file_path = os.path.join(directory, f'keyword:{keyword}__start:{start}_end:{stop}__limit:{tweet_limit}.csv')
+    file_path = os.path.join(current_dir, f'keyword:{keyword}__start:{start_date}_end:{end_date}__iter:{iteration}.csv')
 
     tweet_list = []
-    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(f'{keyword} since:{start} until:{stop}').get_items()):
+    for i, tweet in enumerate(
+            sntwitter.TwitterSearchScraper(f'{keyword} since:{start_date} until:{end_date}').get_items()):
         if i > tweet_limit:
             break
         tweet_list.append([tweet.date,  # Appending all tweet data into a list of list
@@ -32,12 +33,17 @@ def scrapeTweets(start, stop, keyword, directory, tweet_limit=1):
                                                   'Cashtags',
                                                   'Language'])
 
-    df_tweets.to_csv(file_path, index=False)  # Writing df_tweets into new csv file
+    for i in range(1, 1001):
+        if not os.path.isfile(file_path):
+            df_tweets.to_csv(file_path, index=False)
+            break
+        else:
+            file_path = os.path.join(current_dir,
+                                     f'keyword:{keyword}__start:{start_date}_end:{end_date}__limit:{tweet_limit}__iter:{iteration + 1}.csv')
 
-    if os.path.isfile(file_path) == True:
+    if os.path.isfile(file_path):
         return print(f'Successfully saved DataFrame to {file_path}')
-    else:
-        return print('DataFrame not saved -- possible error has occurred.')
+    return print('DataFrame not saved -- possible error has occurred.')
 
 
 start_time_tsla = date(2020, 1, 1).strftime('%Y-%m-%d')
