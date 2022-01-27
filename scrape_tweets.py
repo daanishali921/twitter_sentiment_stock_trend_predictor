@@ -4,11 +4,11 @@ import pandas as pd
 from datetime import date
 
 
-def scrape_tweets(start_date, end_date, keyword, current_dir, tweet_limit=1, iteration=0):
-    if not os.path.exists(current_dir):  # Creates directory in current directory if doesn't already exist
-        os.mkdir(current_dir)
+def scrape_tweets(start_date, end_date, keyword, dir_name, tweet_limit=1, iteration=0):
+    if not os.path.exists(dir_name):  # Creates directory in current directory if doesn't already exist
+        os.mkdir(dir_name)
 
-    file_path = os.path.join(current_dir, f'keyword:{keyword}__start:{start_date}_end:{end_date}__iter:{iteration}.csv')
+    file_path = os.path.join(dir_name, f'keyword:{keyword}__start:{start_date}_end:{end_date}__iter:{iteration}.csv')
 
     tweet_list = []
     for i, tweet in enumerate(
@@ -44,7 +44,7 @@ def scrape_tweets(start_date, end_date, keyword, current_dir, tweet_limit=1, ite
             df_tweets.to_csv(file_path, index=False)
             break
         else:
-            file_path = os.path.join(current_dir,
+            file_path = os.path.join(dir_name,
                                      f'keyword:{keyword}__start:{start_date}_end:{end_date}__limit:{tweet_limit}__iter:{i + 1}.csv')
 
     if os.path.isfile(file_path):

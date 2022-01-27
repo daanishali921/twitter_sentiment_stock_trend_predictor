@@ -14,7 +14,7 @@ def polarityCategories_textblob(tup):
         return 'Neutral'
 
 # using Textblob NLP module
-def polarityColumns_textblob(df_tweets):
+def polarity_columns_textblob(df_tweets):
     df_tweets['Polarity/Subjectivity Scores'] = df_tweets['Text'].apply(lambda text: TextBlob(text).sentiment)
     df_tweets_filtered = df_tweets[df_tweets['Polarity/Subjectivity Scores'] != (0.0, 0.0)]
     df_tweets_filtered = df_tweets_filtered.copy()
@@ -26,7 +26,7 @@ def polarityColumns_textblob(df_tweets):
     return df_tweets_filtered
 
 
-def polarityColumns_vader(df_tweets):
+def polarity_columns_vader(df_tweets):
     df_tweets['Sentiment'] = df_tweets['Text'].apply(lambda text: SentimentIntensityAnalyzer().polarity_scores(text))
     #     df_tweets_filtered = df_tweets_filtered.copy()
     #     df_tweets_filtered['Polarity Categories'] = df_tweets_filtered['Polarity/Subjectivity Scores'].apply(lambda x: polarityCategories_vader(x))
@@ -36,7 +36,7 @@ def polarityColumns_vader(df_tweets):
     return df_tweets
 
 
-def polarityCategories_vader(tup):
+def polarity_categories_vader(tup):
     if tup[0] < -0.05:
         return 'Negative'
     elif tup[0] > 0.05:

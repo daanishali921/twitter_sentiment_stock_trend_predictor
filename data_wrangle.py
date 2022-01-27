@@ -1,7 +1,6 @@
 import pandas as pd
 import re
 
-
 # Creating function to clean dataframes programatically
 
 def data_wrangle(dataframe_list):

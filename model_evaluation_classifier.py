@@ -18,3 +18,4 @@ def print_model_evaluation(model_name, scores):
 #     print('{} evaluation \n'.format(model_name))
     for metric, score in scores.items():
         print('Test {}: {}'.format(metric, score))
+
