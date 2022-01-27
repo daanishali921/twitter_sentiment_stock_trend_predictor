@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import date
 
 
-def scrapeTweets(start_date, end_date, keyword, current_dir, tweet_limit=1, iteration=0):
+def scrape_tweets(start_date, end_date, keyword, current_dir, tweet_limit=1, iteration=0):
     if not os.path.exists(current_dir):  # Creates directory in current directory if doesn't already exist
         os.mkdir(current_dir)
 
