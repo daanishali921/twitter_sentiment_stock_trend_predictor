@@ -29,13 +29,19 @@ stock_option = st.sidebar.selectbox(
 st.sidebar.markdown("***")
 daterange_option = st.sidebar.selectbox(
     label='Choose a date range you would like to be informed about',
-    options=('range1', 'range2', 'range3')
+    options=('March 2021', 'April 2021', 'May 2021')
 )
 
 model = pickle.load(open('C:/Users/Daanish/Desktop/capstone_project/project_environment/pickles/training/pipe_rfc_fit_jan-feb_3daylag.pkl', 'rb'))
 
 prediction_march = model.predict(X_march)
 
-st.header('Prediction of March 2021')
-st.write(prediction_march)
+st.header('Features of Mach 2021')
+st.write(X_march[['Retweet Count', 'Likes Count', 'Reply Count',
+                                  'Positive Tweet Score', 'Negative Tweet Score', 'Neutral Tweet Score',
+                                  'Compound Followers', 'Volume']])
 st.write('---')
+
+st.header('March 2021 True Labels')
+st.write(y_march)
+
