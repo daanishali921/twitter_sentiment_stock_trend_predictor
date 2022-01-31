@@ -129,3 +129,4 @@ if stock_select != 'Select Ticker' and daterange_select != 'Select Range':
 
     with st.expander(f"Autocorrelation of {feature_select}:"):
         st.pyplot(autocorrelation_chart(stock_select, daterange_select, feature_select))
+
