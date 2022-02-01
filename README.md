@@ -10,4 +10,8 @@ Because of this, I built a tool to help day traders like myself gain insight on 
 
 Though in development, the user will be able to go onto an interactive website and choose a stock which the user wants to learn about. 
 The user will then be able to pick from a select amount of dates, the machine learning model in the backend will output a prediction where the user will be able to see how well the model has done against true values on the day(s) selected.
-The user will be provided with visuals as well as probability values of the predictions.
+
+We use the predictions to develop an experiment; we run 2 strategies:
+  1. Buy and hold
+  2. Buy and sell given the suggestions of our model
+We can view the results on the website
