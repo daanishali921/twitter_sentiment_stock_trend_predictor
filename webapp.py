@@ -13,27 +13,45 @@ hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
+            footer:after 
+                {
+                content:'by Daanish Ali'; 
+                visibility: visible;
+                display: block;
+                position: relative;
+                padding: 5px;
+                top: 2px;
+                }
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-st.write("""
-# Twitter Stock Trend Informer
-This app will inform the user of how much twitter trends affect stock trends for certain stocks
-""")
 
 st.sidebar.header('Stock and Date choices:')
 stock_select = st.sidebar.selectbox(label='Choose the stock ticker',
                                     options=('Select Ticker', 'GME', 'TSLA', 'AAPL'))
-st.sidebar.markdown("***")
 daterange_select = st.sidebar.selectbox(label='Choose a date range you would like to be informed about',
                                         options=('Select Range', 'May 24, 2021 - June 24, 2021'))
 st.sidebar.markdown("***")
 
 
+st.write(f"""
+# Twitter Stock Trend Informer
+###### This app will inform the user of how much twitter trends affect stock trends for certain stocks \n 
+
+Our goal is to predict the trend (*Positive or Negative*) of stock prices 3 days in advance within the selected date range using a Binary Classifier.
+We then build an experiment involving two strategies: \n
+1. Buy stock on first day of the date range and then hold onto the stock --> **Record gains/losses**
+2. Buy stock on first day of the date range and then be informed by the predictive model on when to buy or sell --> **Record gains/losses** \n
+
+Below are the results and information about the features/model:
+""")
+
+
+
 # select_box ticker symbol and date range functionality
-def ticker_dataset(ticker_symbol, date_range):
-    X, y, trained_model = None, None, None
+def ticker_data(ticker_symbol, date_range):
+    X, y, trained_model, df_experiment_predictions, verdict_text = None, None, None, None, None
     if ticker_symbol == 'GME':
         if date_range == 'May 24, 2021 - June 24, 2021':
             X = pd.read_pickle(
@@ -43,6 +61,13 @@ def ticker_dataset(ticker_symbol, date_range):
             trained_model = pickle.load(open(
                 'C:/Users/Daanish/Desktop/capstone_project/project_environment/pickles/latest_GME_demo/pipe_rfc_fit_jan-may_PCT3daylag.pkl',
                 'rb'))
+            df_experiment_predictions = pd.read_pickle(
+                filepath_or_buffer='C:/Users/Daanish/Desktop/capstone_project/project_environment/pickles/prediction_experiments/df_gme_prediction_exp.pkl'
+            )
+            verdict_text = 'What the model is doing is predicting stock trends ***three days in the future***. We use this information to build an experiment;\n' \
+                           'We use the predictions the model has given us to suggest a buy or sell.\n' \
+                           'This experiment compares two strategies: buy and hold vs. the suggestions from the model.\n' \
+                           'The graph presents the results from both strategies.'
     elif ticker_symbol == 'TSLA':
         if date_range == 'May 24, 2021 - June 24, 2021':
             pass
@@ -51,11 +76,12 @@ def ticker_dataset(ticker_symbol, date_range):
             pass
     else:
         pass
-    return X, y, trained_model
+    return X, y, trained_model, df_experiment_predictions, verdict_text
 
 
-X, y, model = ticker_dataset(stock_select, daterange_select)
+X, y, model, df_experiment, verdict_text = ticker_data(stock_select, daterange_select)
 
+st.sidebar.header('Learn about the features that trained the model:')
 feature_select = st.sidebar.selectbox(label='Choose features to view their autocorrelation graph',
                                       options=['Retweet Count', 'Likes Count', 'Reply Count', 'Positive Tweet Score',
                                                'Negative Tweet Score', 'Neutral Tweet Score', 'Compound Followers',
@@ -112,22 +138,46 @@ def model_evaluation(model, X, y_true, positive_label):
     scores['f1 score'] = round(f1_score(y_true=y_true, y_pred=y_pred, pos_label="Positive_Trend"), 4)
     return scores
 
+def model_experiment_plot(df):
+    adj_close = df['Adj Close']
+    pred_results = df['pred experiment results']
+
+    plt.plot(adj_close, 'r', linewidth=2)
+    plt.plot(pred_results, 'b', linestyle=':', linewidth=5)
+
+    plt.xlabel('Date', fontsize=12)
+    plt.xticks(rotation=45)
+    plt.ylabel('Current Holdings', fontsize=12)
+
+    a, b = 'Buy-and-hold Strategy Gains/Losses', 'Predictive Model Strategy Gains/Losses'
+    plt.legend((a, b), fontsize=10, loc='upper center', bbox_to_anchor=(0.5, -0.35), ncol=2, frameon=True)
+    plt.title('Buy-and-hold Strategy vs. Predictive Model Strategy', fontsize=14)
+
+    return plt.show()
+
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 if stock_select != 'Select Ticker' and daterange_select != 'Select Range':
-    with st.expander("The Verdict:"):
-        None
+    with st.expander(f"The Experiment Graph for {daterange_select}:"): # Experiment Graph
+        st.pyplot(model_experiment_plot(df_experiment))
+        st.write('What the graph is telling us:')
+        st.write(verdict_text)
+        # st.write("***")
 
-    with st.expander(f"Confusion matrix:"):
+    with st.expander(f"Confusion matrix:"): # Confusion Matrix
         y_true = y
         y_pred = model.predict(X)
         cm = confusion_matrix(y_true=y_true, y_pred=y_pred)
+
         st.pyplot(confusion_plot(X, y, model))
         st.write("Interpreting this matrix:")
-        st.write(f'There are {cm[0][0]} and {cm[1][1]} ***correctly*** predicted Negative Trends and Positive Trends respectively.')
-        st.write(f'There are {cm[0][1]} and {cm[1][0]} ***incorrectly*** predicted Negative Trends and Positive Trends respectively')
+        st.markdown(f'There are {cm[0][0]} and {cm[1][1]} ***correctly*** predicted Negative Trends and Positive Trends respectively.')
+        st.write(f'There are {cm[0][1]} and {cm[1][0]} ***incorrectly*** predicted Negative Trends and Positive Trends respectively.')
 
-    with st.expander(f"Autocorrelation of {feature_select}:"):
+    with st.expander(f"Autocorrelation of {feature_select}:"): # Autocorrelation
         st.pyplot(autocorrelation_chart(stock_select, daterange_select, feature_select))
-
-
+        st.write("What is autocorrelation and why is it important?\n")
+        st.write("Autocorrelation tells us how correlated the feature is with itself in past values. "
+                 "The purpose of autocorrelation in a machine learning context is to inform us about whether "
+                 "or not we should consider past values in building our model. "
+                 "The shaded blue region is the confidence interval and any day that falls into this region is considered statistically insignificant.")
