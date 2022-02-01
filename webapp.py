@@ -36,7 +36,8 @@ st.sidebar.markdown("***")
 
 
 st.write(f"""
-# Twitter Stock Trend Informer
+# (IN DEVELOPMENT)
+# Twitter Stock Trend Informer 
 ###### This app will inform the user of how much twitter trends affect stock trends for certain stocks \n 
 
 Our goal is to predict the trend (*Positive or Negative*) of stock prices 3 days in advance within the selected date range using a Binary Classifier.
@@ -54,16 +55,10 @@ def ticker_data(ticker_symbol, date_range):
     X, y, trained_model, df_experiment_predictions, verdict_text = None, None, None, None, None
     if ticker_symbol == 'GME':
         if date_range == 'May 24, 2021 - June 24, 2021':
-            X = pd.read_pickle(
-                filepath_or_buffer='C:/Users/Daanish/Desktop/capstone_project/project_environment/pickles/latest_GME_demo/X_5-24--6-24_NEW.pkl')
-            y = pd.read_pickle(
-                filepath_or_buffer='C:/Users/Daanish/Desktop/capstone_project/project_environment/pickles/latest_GME_demo/y_5-24--6-24_NEW_CPT-3.pkl')
-            trained_model = pickle.load(open(
-                'C:/Users/Daanish/Desktop/capstone_project/project_environment/pickles/latest_GME_demo/pipe_rfc_fit_jan-may_PCT3daylag.pkl',
-                'rb'))
-            df_experiment_predictions = pd.read_pickle(
-                filepath_or_buffer='C:/Users/Daanish/Desktop/capstone_project/project_environment/pickles/prediction_experiments/df_gme_prediction_exp.pkl'
-            )
+            X = pd.read_pickle(filepath_or_buffer='X_5-24--6-24_.pkl')
+            y = pd.read_pickle(filepath_or_buffer='y_5-24--6-24_CPT-3.pkl')
+            trained_model = pickle.load(open('pipe_rfc_fit_jan-may_PCT3daylag.pkl', 'rb'))
+            df_experiment_predictions = pd.read_pickle(filepath_or_buffer='df_gme_prediction_exp_1.pkl')
             verdict_text = 'What the model is doing is predicting stock trends ***three days in the future***. We use this information to build an experiment;\n' \
                            'We use the predictions the model has given us to suggest a buy or sell.\n' \
                            'This experiment compares two strategies: buy and hold vs. the suggestions from the model.\n' \
@@ -93,8 +88,7 @@ def autocorrelation_chart(ticker_symbol, date_range, feature_select):
     training_data, autocor_plot = None, None
     if ticker_symbol == 'GME':
         if date_range == 'May 24, 2021 - June 24, 2021':
-            training_data = pd.read_pickle(
-                filepath_or_buffer='C:/Users/Daanish/Desktop/capstone_project/project_environment/pickles/latest_GME_demo/X_1-1--5-21_TRAIN.pkl')
+            training_data = pd.read_pickle(filepath_or_buffer='X_1-1--5-21_TRAIN.pkl')
             autocor_plot = sm.graphics.tsa.plot_acf(x=training_data[feature_select],
                                                     lags=15,
                                                     alpha=.05)
