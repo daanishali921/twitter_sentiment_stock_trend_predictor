@@ -14,4 +14,3 @@ The user will then be able to pick from a select amount of dates, the machine le
 We use the predictions to develop an experiment; we run 2 strategies:
   1. Buy and hold
   2. Buy and sell given the suggestions of our model
-We can view the results on the website
