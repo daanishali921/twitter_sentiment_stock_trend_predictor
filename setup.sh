@@ -1,5 +1,6 @@
 mkdir -p ~/.streamlit/
-echo "\
+echo "[theme]
+base="dark"\
 [server]\n\
 headless = true\n\
 port = $PORT\n\
