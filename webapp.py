@@ -50,6 +50,7 @@ Below are the results and information about the features/model:
 
 
 # select_box ticker symbol and date range functionality
+
 def ticker_data(ticker_symbol, date_range):
     X, y, trained_model, df_experiment_predictions, verdict_text = None, None, None, None, None
     if ticker_symbol == 'GME':
@@ -130,6 +131,7 @@ def model_evaluation(model, X, y_true, positive_label):
     scores['area under precision-recall curve'] = round(metrics.auc(recalls, precisions), 4)
     scores['f1 score'] = round(f1_score(y_true=y_true, y_pred=y_pred, pos_label="Positive_Trend"), 4)
     return scores
+
 
 def model_experiment_plot(df):
     adj_close = df['Adj Close']
