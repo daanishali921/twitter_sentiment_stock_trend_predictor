@@ -44,7 +44,7 @@ We then build an experiment involving two strategies: \n
 1. Buy stock on first day of the date range and then hold onto the stock --> **Record gains/losses**
 2. Buy stock on first day of the date range and then be informed by the predictive model on when to buy or sell --> **Record gains/losses** \n
 
-Below are the results and information about the features/model:
+After choosing a stock ticker and date range, the results of our experiment and information about the features/model will appear below:
 """)
 
 
