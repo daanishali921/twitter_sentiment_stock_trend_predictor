@@ -28,22 +28,20 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 st.sidebar.header('Stock and Date choices:')
 stock_select = st.sidebar.selectbox(label='Choose the stock ticker',
-                                    options=('Select Ticker', 'GME', 'TSLA', 'AAPL'))
+                                    options=('Select Ticker', 'GME'))
 daterange_select = st.sidebar.selectbox(label='Choose a date range you would like to be informed about',
-                                        options=('Select Range', 'May 24, 2021 - June 24, 2021'))
+                                        options=('Select Range', 'May 26, 2021 - June 24, 2021'))
 st.sidebar.markdown("***")
 
 
 st.write(f"""
-# (IN DEVELOPMENT)
 # Twitter Stock Trend Informer 
 ###### This app will inform the user of how much twitter trends affect stock trends for certain stocks \n 
 
-Our goal is to predict the trend (*Positive or Negative*) of stock prices 3 days in advance within the selected date range using a Binary Classifier.
+Our goal is to predict the trend (*Positive or Negative*) of stock prices 3 days in advance within the selected date range using a **Random Forest Binary Classifier**.
 We then build an experiment involving two strategies: \n
 1. Buy stock on first day of the date range and then hold onto the stock --> **Record gains/losses**
 2. Buy stock on first day of the date range and then be informed by the predictive model on when to buy or sell --> **Record gains/losses** \n
-
 After choosing a stock ticker and date range, the results of our experiment and information about the features/model will appear below:
 """)
 
@@ -54,7 +52,7 @@ After choosing a stock ticker and date range, the results of our experiment and 
 def ticker_data(ticker_symbol, date_range):
     X, y, trained_model, df_experiment_predictions, verdict_text = None, None, None, None, None
     if ticker_symbol == 'GME':
-        if date_range == 'May 24, 2021 - June 24, 2021':
+        if date_range == 'May 26, 2021 - June 24, 2021':
             X = pd.read_pickle(filepath_or_buffer='X_5-24--6-24_.pkl')
             y = pd.read_pickle(filepath_or_buffer='y_5-24--6-24_CPT-3.pkl')
             trained_model = pickle.load(open('pipe_rfc_fit_jan-may_PCT3daylag.pkl', 'rb'))
@@ -62,11 +60,18 @@ def ticker_data(ticker_symbol, date_range):
             verdict_text = 'What the model is doing is predicting stock trends ***three days in the future***. We use this information to build an experiment;\n' \
                            'We use the predictions the model has given us to suggest a buy or sell.\n' \
                            'This experiment compares two strategies: buy and hold vs. the suggestions from the model.\n' \
-                           'The graph presents the results from both strategies.'
+                           'The graph presents the results from both strategies. \n \n' \
+                           'Both strategies start with $350 and we buy one GME stock. \n \n'  \
+                           '**The way the predictive model strategy is set up is the following:** \n \n' \
+                           '1. We start with buying the stock on the first day at opening price. \n \n' \
+                           '2. Then, we loop through each day; every iteration does a check whether or not we are currently holding a stock, then, ' \
+                           'based on a positive/negative stock trend prediction for the next day, we decide to keep the stock or sell ' \
+                           'it at closing (positive = hold/ negative = sell). \n \n' \
+                           '3. If there are successive negative trend predictions and we do not have the stock, ' \
+                           'we continue to not hold it until a positive prediction occurs. ' \
+                           'We then buy at opening price the day of the predicted positve trend (the next day). \n \n \n \n' \
+                           'Unfortunately, we can see our models performance within the experiment did not perform better than a baseline buy-and-hold strategy.'
     elif ticker_symbol == 'TSLA':
-        if date_range == 'May 24, 2021 - June 24, 2021':
-            pass
-    elif ticker_symbol == 'AAPL':
         if date_range == 'May 24, 2021 - June 24, 2021':
             pass
     else:
@@ -87,7 +92,7 @@ feature_select = st.sidebar.selectbox(label='Choose features to view their autoc
 def autocorrelation_chart(ticker_symbol, date_range, feature_select):
     training_data, autocor_plot = None, None
     if ticker_symbol == 'GME':
-        if date_range == 'May 24, 2021 - June 24, 2021':
+        if date_range == 'May 26, 2021 - June 24, 2021':
             training_data = pd.read_pickle(filepath_or_buffer='X_1-1--5-21_TRAIN.pkl')
             autocor_plot = sm.graphics.tsa.plot_acf(x=training_data[feature_select],
                                                     lags=15,
@@ -96,9 +101,6 @@ def autocorrelation_chart(ticker_symbol, date_range, feature_select):
             plt.ylabel('Autocorrelation')
             plt.title(f'Autocorrelation for {feature_select}')
     elif ticker_symbol == 'TSLA':
-        if date_range == 'May 24, 2021 - June 24, 2021':
-            pass
-    elif ticker_symbol == 'AAPL':
         if date_range == 'May 24, 2021 - June 24, 2021':
             pass
     else:
@@ -133,11 +135,91 @@ def model_evaluation(model, X, y_true, positive_label):
     return scores
 
 
-def model_experiment_plot(df):
-    adj_close = df['Adj Close']
-    pred_results = df['pred experiment results']
+def graph_algorithm_model(df):
+    prediction_series_ = df['buy/sell preds +2']
+    open_series_ = df['Open']
+    close_series_ = df['Adj Close']
+    stock_hold = True
 
-    plt.plot(adj_close, 'r', linewidth=2)
+    iterable = []
+    for pred, open__, close__ in zip(prediction_series_, open_series_, close_series_):
+        iterable.append((pred, open__, close__))
+
+    holding = 350
+    close_previous = iterable[0][2]  # previous day hold price if stock is held
+    open_previous = iterable[0][1]  # opening price of first day
+
+    final_list = []
+    final_list.append(holding + (close_previous - open_previous))
+    holding = holding + (close_previous - open_previous)
+
+    for i, e in enumerate(iterable):
+        if stock_hold == True:
+            if e[0] == -1.0:
+                holding = holding + (iterable[i + 1][2] - close_previous)  # update holdings for end of day price
+                final_list.append(holding)  # append updated hold value onto list
+                stock_hold = False  # sell stock
+                close_previous = iterable[i + 1][2]  # update previously used close price
+                continue
+
+            elif e[0] == 1.0:
+                holding = holding + (iterable[i + 1][2] - close_previous)
+                final_list.append(holding)
+                close_previous = iterable[i + 1][2]  # update previously used close price
+                continue
+
+        if stock_hold == False:
+            if e[0] == -1.0:
+                # hold price stays the same
+                # not updating previous close price
+                final_list.append(holding)  # append same hold value onto list
+                continue
+
+            elif e[0] == 1.0:
+                stock_hold = True  # buy stock AT OPENING PRICE
+                holding = holding + (iterable[i + 1][2] - iterable[i + 1][
+                    1])  # Profits (if correct) or losses are from the difference between close and open price
+                final_list.append(holding)
+                close_previous = iterable[i + 1][2]
+                continue
+    model_outcome = pd.DataFrame(data=final_list, columns=['model_outcome'])[:21]
+    model_outcome.index = prediction_series_.index
+    return model_outcome
+
+
+def graph_algorithm_base(df):
+    open_series_ = df['Open']
+    close_series_ = df['Adj Close']
+
+    iterable = []
+    for open__, close__ in zip(open_series_, close_series_):
+        iterable.append((open__, close__))
+
+    holding = 350
+    close_previous = iterable[0][1]  # previous day hold price if stock is held
+    open_previous = iterable[0][0]  # opening price of first day
+
+    final_list = []
+    final_list.append(holding + (close_previous - open_previous))
+    holding = holding + (close_previous - open_previous)
+
+    try:
+        for i, e in enumerate(iterable):
+            holding = holding + (iterable[i + 1][1] - close_previous)  # update holdings for end of day price
+            final_list.append(holding)  # append updated hold value onto list
+            close_previous = iterable[i + 1][1]  # update previously used close price
+
+    except IndexError:
+        buy_hold_outcome = pd.DataFrame(data=final_list, columns=['buy_hold_outcome'])
+        buy_hold_outcome.index = open_series_.index
+        return buy_hold_outcome
+
+
+def model_experiment_plot(df):
+    base_results = graph_algorithm_base(df_experiment)
+    pred_results = graph_algorithm_model(df_experiment)
+
+    plt.plot(base_results, 'r', linewidth=2)
     plt.plot(pred_results, 'b', linestyle=':', linewidth=5)
 
     plt.xlabel('Date', fontsize=12)
