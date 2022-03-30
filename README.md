@@ -6,9 +6,9 @@ https://twist-informer.herokuapp.com/
 
 ### About
 
-As somebody who spends most of his business days day trading, the majority of the thoughts that are behind the day involve wondering what and how market trends will come into fruition and why.
+As somebody who spends most of his work week day trading, the majority of the thoughts that are behind the day involve wondering what and how market trends will come into fruition and why.
 In the past year and a half, the stock market has seen impactful influences from many different avenues; one of them being social media.
-Because of this, I built a tool to help day traders like myself gain insight on the influence of twitter trends on stock trends.
+Because of this, I built a tool to help day traders like myself gain insight on the influence of Twitter trends on stock trends.
 
 
 
@@ -17,11 +17,11 @@ Because of this, I built a tool to help day traders like myself gain insight on 
 Our target user is the day trader who would like to investigate whether or not Twitter trends can serve as a signal to stock market trends.
 
 The user will be able to go onto an interactive website and choose a stock (currently one: **$GME**) which the user wants to learn about. 
-The user will then be able to pick a date (currently one date), the machine learning model in the backend will output predictions about stock trends 3 days into the future (which accounts for time lag). 
+The user will then be able to pick a date (currently one date), and the machine learning model in the backend will output predictions about stock trends 3 days into the future (which accounts for time lag). 
 
 We use the predictions to develop an experiment; we run 2 strategies:
   1. Buy and hold
-  2. Buy and sell given the suggestions of our model
+  2. Buy and sell, given the suggestions of our model
   
 
 
@@ -34,7 +34,7 @@ Getting the stock data was very simple, we used a Python library called yfinance
 The tweet text feature on our DataFrame was rather messy, but we found a general approach to clean up and filter the column of the DataFrame using standard Pandas DataFrame methods as well as further filtering the text using regular expressions to get rid of redundancies. 
 
 We ended up with a DataFrame of over 200,000 rows.
-After the processing of features, we aggregated them into a DateTime Indexed DataFrame to be able to fit into the model. We took the average per day of each feature.
+After the processing of features, we aggregated them into a DateTime indexed DataFrame to be able to fit into the model. We took the average per day of each feature.
 
 ### Natural Language Processing/Feature Engineering
 
