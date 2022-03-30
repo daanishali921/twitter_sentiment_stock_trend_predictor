@@ -47,6 +47,7 @@ After choosing a stock ticker and date range, the results of our experiment and 
 
 
 
+
 # select_box ticker symbol and date range functionality
 
 def ticker_data(ticker_symbol, date_range):
