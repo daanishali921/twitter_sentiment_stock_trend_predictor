@@ -47,7 +47,6 @@ After choosing a stock ticker and date range, the results of our experiment and 
 
 
 
-
 # select_box ticker symbol and date range functionality
 
 def ticker_data(ticker_symbol, date_range):
@@ -241,6 +240,9 @@ if stock_select != 'Select Ticker' and daterange_select != 'Select Range':
         st.write('What the graph is telling us:')
         st.write(verdict_text)
         # st.write("***")
+
+    with st.expander(f"Model Scores of {daterange_select}:"):
+        st.write(model_evaluation(model, X, y, positive_label='Positive_Trend'))
 
     with st.expander(f"Confusion matrix:"): # Confusion Matrix
         y_true = y
