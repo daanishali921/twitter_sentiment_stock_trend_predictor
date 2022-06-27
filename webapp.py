@@ -23,6 +23,14 @@ hide_st_style = """
                 }
             </style>
             """
+
+st.set_page_config(
+   page_title="TwiST Informer",
+   page_icon=':chart_with_upwards_trend:',
+   layout="wide",
+   initial_sidebar_state="expanded",
+)
+
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
