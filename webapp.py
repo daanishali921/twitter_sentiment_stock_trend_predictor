@@ -23,7 +23,6 @@ hide_st_style = """
                 }
             </style>
             """
-
 st.set_page_config(
    page_title="TwiST Informer",
    page_icon=':chart_with_upwards_trend:',
